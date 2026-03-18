@@ -1,25 +1,26 @@
-# agent.py — ReAct Agent with multiple tools (LangChain structured tool calling)
+# agent.py — ReAct Agent with multiple tools (LangGraph) v2.0
 from __future__ import annotations
 
 import json
 import time
-from typing import Generator, List
-
-from langchain_community.chat_models import ChatOllama
-from langchain.agents import AgentExecutor, create_react_agent
+from typing import Generator, List, Optional
+from langchain_ollama import ChatOllama
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from langgraph.prebuilt import create_react_agent
 from loguru import logger
 
-from config import OLLAMA_BASE_URL, DEFAULT_MODEL, TEMPERATURE
-from prompts.agent_prompts import react_prompt
+from config import settings, OLLAMA_BASE_URL, DEFAULT_MODEL, TEMPERATURE
 from tools.search_tool import web_search
 from tools.calculator_tool import calculator
 from tools.file_tool import file_read, file_write, file_list
 from tools.datetime_tool import get_datetime
 
+
+# All available tools
 ALL_TOOLS = [web_search, calculator, file_read, file_write, file_list, get_datetime]
 
 
+# ── LLM Factory ────────────────────────────────────────────────────────────────
 def _llm(streaming: bool = False) -> ChatOllama:
     return ChatOllama(
         model=DEFAULT_MODEL,
@@ -29,116 +30,119 @@ def _llm(streaming: bool = False) -> ChatOllama:
     )
 
 
-def _build_executor(streaming: bool = False) -> AgentExecutor:
-    llm = _llm(streaming=streaming)
-    agent = create_react_agent(llm=llm, tools=ALL_TOOLS, prompt=react_prompt)
-    return AgentExecutor(
-        agent=agent,
-        tools=ALL_TOOLS,
-        verbose=True,
-        handle_parsing_errors=True,
-        max_iterations=8,
-        return_intermediate_steps=True,
-    )
+# ── Global Agent Cache ────────────────────────────────────────────────────────
+_agent = None
 
 
-def run(question: str, chat_history: List[BaseMessage] | None = None) -> dict:
+def get_agent():
+    """Get or create the agent singleton."""
+    global _agent
+    if _agent is None:
+        _agent = create_react_agent(
+            model=_llm(),
+            tools=ALL_TOOLS,
+        )
+        logger.info("Agent initialized")
+    return _agent
+
+
+def reset_agent():
+    """Reset agent (useful for testing)."""
+    global _agent
+    _agent = None
+    logger.info("Agent reset")
+
+
+# ── Run Functions ─────────────────────────────────────────────────────────────
+def run(question: str, chat_history: Optional[List[BaseMessage]] = None) -> dict:
     """Non-streaming agent run. Returns answer + tool trace."""
     t0 = time.perf_counter()
-    executor = _build_executor()
-    result = executor.invoke({
-        "input": question,
-        "chat_history": chat_history or [],
-    })
+    
+    agent = get_agent()
+    
+    # Build input as messages
+    messages = []
+    if chat_history:
+        messages.extend(chat_history)
+    messages.append(HumanMessage(content=question))
+    
+    # Run agent
+    result = agent.invoke({"messages": messages}, stream_mode="values")
+    
     latency_ms = round((time.perf_counter() - t0) * 1000)
-
+    
+    # Extract tool calls from messages
     steps = []
-    for action, obs in result.get("intermediate_steps", []):
-        steps.append({
-            "tool": action.tool,
-            "input": action.tool_input,
-            "output": str(obs)[:500],
-        })
-
+    result_messages = result.get("messages", [])
+    for msg in result_messages:
+        if hasattr(msg, "type") and msg.type == "tool":
+            steps.append({
+                "tool": getattr(msg, "name", "unknown"),
+                "input": str(getattr(msg, "tool_input", ""))[:200],
+                "output": str(getattr(msg, "content", ""))[:500],
+            })
+    
+    # Final answer is the last AI message
+    answer = ""
+    for msg in reversed(result_messages):
+        if hasattr(msg, "type") and msg.type == "ai":
+            answer = getattr(msg, "content", "")
+            break
+    
     return {
-        "answer": result.get("output", ""),
+        "answer": answer,
         "steps": steps,
         "latency_ms": latency_ms,
         "tool_calls": len(steps),
     }
 
 
-def run_stream(question: str, chat_history: List[BaseMessage] | None = None) -> Generator[dict, None, None]:
-    """Streaming generator. Yields:
-      {"type": "token", "content": "..."}
-      {"type": "tool_start", "tool": "...", "input": "..."}
-      {"type": "tool_end", "output": "..."}
-      {"type": "done", "latency_ms": ..., "tool_calls": ...}
-    """
+def run_stream(question: str, chat_history: Optional[List[BaseMessage]] = None) -> Generator[dict, None, None]:
+    """Streaming version - yields events as they happen."""
     t0 = time.perf_counter()
     tool_calls = 0
-
-    # Use callbacks for tool event streaming
-    from langchain_core.callbacks import BaseCallbackHandler
-
-    class _StreamHandler(BaseCallbackHandler):
-        def __init__(self, gen_fn):
-            self._emit = gen_fn
-
-        def on_llm_new_token(self, token: str, **kwargs):
-            self._emit({"type": "token", "content": token})
-
-        def on_tool_start(self, serialized, input_str, **kwargs):
-            tool_name = serialized.get("name", "unknown")
-            self._emit({"type": "tool_start", "tool": tool_name, "input": str(input_str)[:200]})
-
-        def on_tool_end(self, output, **kwargs):
-            nonlocal tool_calls
-            tool_calls += 1
-            self._emit({"type": "tool_end", "output": str(output)[:300]})
-
-    events: List[dict] = []
-
-    def _emit(event: dict):
-        events.append(event)
-
-    handler = _StreamHandler(_emit)
-    llm = ChatOllama(
-        model=DEFAULT_MODEL,
-        base_url=OLLAMA_BASE_URL,
-        temperature=TEMPERATURE,
-        streaming=True,
-        callbacks=[handler],
-    )
-    agent = create_react_agent(llm=llm, tools=ALL_TOOLS, prompt=react_prompt)
-    executor = AgentExecutor(
-        agent=agent,
-        tools=ALL_TOOLS,
-        verbose=False,
-        handle_parsing_errors=True,
-        max_iterations=8,
-        return_intermediate_steps=True,
-        callbacks=[handler],
-    )
-
-    # Run in same thread (synchronous) but yield accumulated events
-    result = executor.invoke({
-        "input": question,
-        "chat_history": chat_history or [],
-    })
-
-    for event in events:
-        yield event
-
+    
+    agent = get_agent()
+    
+    messages = []
+    if chat_history:
+        messages.extend(chat_history)
+    messages.append(HumanMessage(content=question))
+    
+    for event in agent.stream({"messages": messages}, stream_mode="updates"):
+        for node_name, node_output in event.items():
+            if node_name == "agent":
+                msgs = node_output.get("messages", [])
+                for msg in msgs:
+                    if hasattr(msg, "type") and msg.type == "ai":
+                        content = getattr(msg, "content", "")
+                        if content:
+                            yield {"type": "token", "content": content}
+            elif node_name.startswith("tools_"):
+                msgs = node_output.get("messages", [])
+                for msg in msgs:
+                    if hasattr(msg, "type") and msg.type == "tool":
+                        tool_calls += 1
+                        yield {
+                            "type": "tool_end",
+                            "tool": getattr(msg, "name", "unknown"),
+                            "output": str(getattr(msg, "content", ""))[:300],
+                        }
+    
     latency_ms = round((time.perf_counter() - t0) * 1000)
-    steps = []
-    for action, obs in result.get("intermediate_steps", []):
-        steps.append({"tool": action.tool, "input": action.tool_input, "output": str(obs)[:300]})
-
     yield {
-        "type": "final",
-        "answer": result.get("output", ""),
-        "steps": steps,
+        "type": "done",
         "latency_ms": latency_ms,
-        "tool_calls": len(steps),
+        "tool_calls": tool_calls,
+    }
+
+
+# ── Utility ───────────────────────────────────────────────────────────────────
+def get_stats() -> dict:
+    """Get agent stats."""
+    return {
+        "num_tools": len(ALL_TOOLS),
+        "tool_names": [t.name for t in ALL_TOOLS],
+        "model": DEFAULT_MODEL,
+        "ollama_url": OLLAMA_BASE_URL,
     }
