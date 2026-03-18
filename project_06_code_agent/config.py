@@ -17,6 +17,8 @@ ALLOWED_LANGUAGES = {"python", "bash", "javascript"}
 # Git (optional)
 GIT_ENABLED: bool = os.getenv("GIT_ENABLED", "false").lower() == "true"
 
+AGENT_MAX_ITERATIONS: int = int(os.getenv("AGENT_MAX_ITERATIONS", "8"))
+
 LANGSMITH_ENABLED: bool = os.getenv("LANGSMITH_API_KEY", "") != ""
 if LANGSMITH_ENABLED:
     os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
