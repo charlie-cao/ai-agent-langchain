@@ -1,126 +1,85 @@
-在美国（尤其是加州洛杉矶这样的科技中心），AI Agent 工程师的实战项目和需求跟全球趋势高度重合，但更偏向**企业级落地**、**合规性强**（隐私、数据安全、SOC2）、**高薪岗位**（FAANG / Big Tech / fintech / healthcare），以及**agentic AI**（自主决策、多步规划）的方向。
+# AI Agent 项目清单 (plan001)
 
-根据2025-2026年的美国职场数据（LinkedIn、Glassdoor、招聘JD趋势），最吃香的项目类型基本是这些，按**面试含金量 + 真实企业付费意愿 + 薪资回报**从高到低排序（一行一个）：
+> 本文件只记录项目列表和状态，不含背景分析。  
+> 技术规范详见 `.github/copilot-instructions.md`。
 
-1. 生产级 RAG + Agentic RAG 系统（带 hybrid search、rerank、citation、self-correction、eval pipeline）  
-   美国企业最常见落地类型，几乎所有大公司内部知识库/客服/合规都从这个起步。
+---
 
-2. 多工具/函数调用 + ReAct/Plan-and-Execute Agent（接内部API、数据库、外部工具如Search/Slack/Email）  
-   OpenAI Function Calling / LangGraph / CrewAI 风格，FAANG 和 fintech 超级爱考。
+## 一、已完成项目（projects 01~14）
 
-3. 多智能体协作系统（Multi-Agent Framework）（规划/研究/执行/审核/批评家角色分工）  
-   CrewAI、AutoGen、LangGraph 多 Agent 真实案例最多，Salesforce、Google Cloud 等都在推。
+| 编号 | 文件夹 | 项目名 | 优先级 | 状态 |
+|------|--------|--------|--------|------|
+| 01 | `project_01_rag_agent` | 企业级 RAG + Agentic RAG | P0 | ✅ 完成 |
+| 02 | `project_02_tool_agent` | 多工具调用 ReAct Agent | P0 | ✅ 完成 |
+| 03 | `project_03_multi_agent` | 多智能体协作系统 | P0 | ✅ 完成 |
+| 04 | `project_04_deep_research` | 深度研究 Agent | P0 | ✅ 完成 |
+| 05 | `project_05_enterprise_bot` | 企业内部自动化助手 | P1 | ✅ 完成 |
+| 06 | `project_06_code_agent` | 代码/DevOps Agent | P1 | ✅ 完成 |
+| 07 | `project_07_finance_agent` | 金融/合规分析 Agent | P1 | ✅ 完成 |
+| 08 | `project_08_customer_service` | 客服全链路 Agent | P1 | ✅ 完成 |
+| 09 | `project_09_browser_agent` | 浏览器自动化 Agent | P2 | ✅ 完成 |
+| 10 | `project_10_hr_agent` | HR/招聘筛选 Agent | P2 | ✅ 完成 |
+| 11 | `project_11_legal_agent` | 法律合同审查 Agent | P2 | ✅ 完成 |
+| 12 | `project_12_quant_agent` | 量化研究 Agent | P2 | ✅ 完成 |
+| 13 | `project_13_medical_agent` | 医疗辅助 Agent | P2 | ✅ 完成 |
+| 14 | `project_14_sales_crm_agent` | 销售/CRM Agent | P2 | ✅ 完成 |
 
-4. 自主深度研究/报告生成 Agent（Deep Research Agent，能迭代搜索、阅读PDF、生成带图表报告）  
-   OpenAI Deep Research / Perplexity 风格，美国咨询/投行/市场研究需求极大。
+---
 
-5. 企业内部自动化 Agent（Slack/Teams/Email 智能助手 + 记忆 + 权限 + 工单创建）  
-   ServiceNow、Moveworks、Microsoft Copilot 等生态，美国大厂内部工具首选。
+## 二、待开发项目（projects 15~24）
 
-6. 代码/DevOps Agent（代码生成 + review + debug + auto PR + CI/CD 集成）  
-   Devin / SWE-Agent / GitHub Copilot Workspace 风格，硅谷软件公司抢手。
+> 本批次引入 **openclaw** 系列（自动化内容生成 + 社交媒体管理），  
+> 以及企业级高价值赛道，共 10 个项目。
 
-7. 金融/合规模型 Agent（fraud detection、compliance check、KYC、合同审查）  
-   JPMorgan、Wells Fargo、BlackRock 等真实案例多，薪资顶尖但合规要求高。
+| 编号 | 文件夹 | 项目名 | 优先级 | 核心价值 |
+|------|--------|--------|--------|----------|
+| 15 | `project_15_supply_chain_agent` | 供应链/物流优化 Agent | P3 | 库存预测、路径优化、异常预警 |
+| 16 | `project_16_education_agent` | 个性化教育 Agent | P3 | 学习规划、题目讲解、自适应出题 |
+| 17 | `project_17_ops_agent` | 运维故障根因分析 Agent | P3 | 日志分析、自动工单、RCA 报告 |
+| 18 | `project_18_ecommerce_agent` | 电商自动化 Agent | P3 | 竞品监控、调价建议、商品描述生成 |
+| 19 | `project_19_privacy_agent` | 本地隐私 Agent | P3 | 全离线运行、PII 保护、政企合规 |
+| 20 | `project_20_openclaw_weibo` | openclaw 微博内容 Agent | P3 | 自动生成微博 + 评论互动 + 定时发布 |
+| 21 | `project_21_openclaw_xiaohongshu` | openclaw 小红书 Agent | P3 | 图文笔记生成 + SEO 标签优化 + 发布 |
+| 22 | `project_22_openclaw_zhihu` | openclaw 知乎 Agent | P3 | 问答回复生成 + 专栏文章 + 引流 |
+| 23 | `project_23_openclaw_douyin` | openclaw 抖音脚本 Agent | P3 | 视频脚本生成 + 字幕 + 话题标签 |
+| 24 | `project_24_openclaw_twitter` | openclaw Twitter/X Agent | P3 | 英文推文生成 + Thread + 定时发布 |
 
-8. 客服/支持全链路 Agent（Tier-1 自动解决 + 转人工 + 多语言 + 情感分析）  
-   Wells Fargo Fargo、Amazon 等已大规模部署。
+---
 
-9. 浏览器自动化 + 操作 Agent（Playwright + LLM 做表单、数据采集、竞品监控）  
-   电商/市场情报/销售自动化常见，美国 startup 爱用。
+## 三、openclaw 系列说明
 
-10. HR/招聘 Agent（简历筛选 + JD 匹配 + 初筛面试 + offer letter 生成）  
-    很多 HR Tech 公司在推。
+openclaw 是一组社交媒体自动化工具，定位为：
 
-11. 医疗辅助 Agent（非诊断类，如患者 triage、预约、EHR 总结）  
-    注意 HIPAA 合规，更多用于展示而非真实生产。
+- **内容生产**：通过 LLM 自动生成适合各平台调性的内容（中英文）
+- **管理调度**：统一管理多平台发布时间、账号、内容队列
+- **数据回流**：抓取互动数据（点赞/评论/转发）→ 反馈给 Agent 优化下一轮内容
+- **合规设计**：内容审查（广告法、违禁词过滤）、频率限制、账号轮换
 
-12. 销售/Lead 管理 Agent（自动跟进、email 撰写、CRM 更新）  
-    Salesforce Einstein、Gong 等方向。
+每个 openclaw 子项目遵循：
 
-13. 供应链/物流优化 Agent（预测、路由、库存）  
-    美国物流巨头如 UPS/FedEx 有真实案例。
+```
+project_2X_openclaw_XXX/
+├── agent.py              # 内容生成 Agent
+├── publisher.py          # 发布调度器（模拟/真实）
+├── scraper.py            # 互动数据采集（可 mock）
+├── tools/
+│   ├── content_generator.py   # 平台调性内容生成
+│   ├── tag_optimizer.py       # 话题/标签优化
+│   └── schedule_tool.py       # 发布时间规划
+├── tests/
+└── ...
+```
 
-14. 本地/隐私优先 Agent（Ollama + LangGraph 全 offline 运行）  
-    政府/国防/隐私敏感企业需求上升。
+---
 
-15. 量化/投资研究 Agent（接 Polygon/Yahoo Finance，生成研报/交易信号）  
-    BlackRock、hedge funds 风格。
+## 四、项目总进度
 
-16. Token 交换平台。可以将本地模型挂出去，有用的直接租用， Token 点对点。
+```
+已完成: 14/24  (58%)
+待开发: 10/24  (42%)
 
-17. openclaw 系列 各个行业和场景的应用案例，使用自动化生成社交内容，龙虾进行管理。
-
-在美国做这些项目，强烈建议：
-
-- 用 **LangGraph / CrewAI / LlamaIndex** 这些主流框架（美国招聘最认）
-- 强调 **evaluation**（RAGAS、DeepEval）、**observability**（LangSmith / Phoenix）、**部署**（FastAPI / Docker / AWS / Vercel）
-- 加 **隐私/安全**（PII masking、RBAC、audit log）
-- 放 GitHub + 个人网站 + demo（Streamlit / Gradio），写清架构图、benchmark、cost analysis
-- 目标公司：OpenAI、Anthropic、Google、Meta、Microsoft、JPMorgan、Salesforce、Databricks 等
-
-如果你在洛杉矶，附近机会多（硅滩 + 大厂分部），优先冲 **1-5** 这几个，做深1-2个，能显著提升简历通过率和 offer 档次。
-
-你现在最感兴趣哪个？想听美国版的具体技术路线、JD 关键词、或某个案例的拆解？
-
-
-这里是 AI Agent 工程师最有实战价值、面试/简历/涨薪含金量较高的项目案例（按目前企业真实需求和出现频率从高到低粗排）：
-
-1. 企业级文档知识库 + RAG + Agent（带引用、纠错、自评、守栏）  
-   最吃香、最常考、最多公司落地的类型
-
-2. 多工具调用 Agent（搜索引擎 + 代码解释器 + 数据库查询 + 文件读写 + API调用）  
-   ReAct / OpenAI Function Calling / Toolformer 风格
-
-3. 多智能体协作系统（Multi-Agent）（角色分工：规划师、研究员、写手、审核者、执行者）  
-   AutoGen / CrewAI / LangGraph 多 Agent 架构
-
-4. 自主研究/深度研究 Agent（能连续搜索、阅读、总结、迭代提问的那种）  
-   OpenAI Deep Research / Perplexity 风格 / Researcher + Critic 双角色
-
-5. 全自动报告生成 Agent（输入主题 → 搜索 → 分析 → 图表 → 写报告 → PPT/Word 输出）
-
-6. 代码生成 + 调试 + PR 提交 Agent（Dev Agent / SWE-Agent 风格）
-
-7. 钉钉/企业微信/飞书/Slack 智能助手（带记忆、权限控制、工单创建、多人@）
-
-8. 自动化浏览器操作 Agent（Playwright / Selenium + LLM）做表单填写、竞品监控、抢购、数据采集
-
-9. 个人/企业财务分析 Agent（连银行/支付宝/Excel/飞书表格，自动记账、对账、预测）
-
-10. 招聘/简历筛选 + 面试官 Agent（解析JD → 筛选简历 → 自动初筛面试）
-
-11. 法律/合同审查 + 风险提示 Agent（特别吃法律垂域知识库）
-
-12. 医疗/病例辅助分析 Agent（注意合规，更多用于学习展示）
-
-13. 电商客服 + 退换货 + 物流查询全链路 Agent
-
-14. 抖音/小红书/知乎/微博自动内容生产 + 定时发布 Agent
-
-15. 量化交易/股票研报生成 Agent（接 Polygon / AKShare / Wind 等接口）
-
-16. 本地全隐私运行的个人助理 Agent（Ollama + AnythingLLM + LangGraph）
-
-17. 游戏内智能 NPC / 自动打金 / 陪玩 Agent（Unity / UE + LLM）
-
-18. 工业/运维故障根因分析 + 自动工单生成 Agent
-
-19. 教育领域的个性化学习规划 + 题目讲解 Agent
-
-20. 竞品价格/促销实时监控与调价建议 Agent
-
-这些项目从上往下，综合来看「简历好看度 + 技术深度 + 企业真实付费意愿」逐渐递减，但也越来越细分赛道。
-
-如果你现在只想快速做一个最有回报的，强烈建议从 **第1～4项** 中选一个认真做深（最好做成产品能给别人用），然后把过程、架构图、评估指标、踩坑经验全部写出来，放GitHub + 个人网站，面试时效果最好。
-
-你目前最想往哪个方向深挖？或者想听其中某一个的具体技术拆解路线？
-
-
-echo "# ai-agent-langchain" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin git@github.com:charlie-cao/ai-agent-langchain.git
-git push -u origin main
+P0 完成: 4/4  ✅
+P1 完成: 4/4  ✅
+P2 完成: 6/6  ✅
+P3 待开发: 0/10
+```
