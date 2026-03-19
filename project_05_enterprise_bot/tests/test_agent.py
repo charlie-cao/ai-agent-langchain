@@ -66,9 +66,9 @@ def test_create_and_list_ticket():
         "category": "IT",
     })
     assert "TKT-" in result
-    # Extract ticket ID
+    # Extract ticket ID (format: TKT-XXXXXX where X is hex)
     import re
-    match = re.search(r"TKT-\d+", result)
+    match = re.search(r"TKT-[A-F0-9]+", result)
     assert match is not None
 
 

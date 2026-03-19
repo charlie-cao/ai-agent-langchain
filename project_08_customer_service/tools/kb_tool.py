@@ -12,8 +12,8 @@ from loguru import logger
 
 from config import KB_DIR, MAX_KB_RESULTS
 
-# ── 加载知识库 ────────────────────────────────────────────────────────────────
-_KB_PATH = Path(KB_DIR) / "faq.json"
+# Use path relative to this file's location, not CWD
+_KB_PATH = Path(__file__).parent.parent / KB_DIR / "faq.json"
 
 def _load_kb() -> list[dict]:
     """加载知识库JSON文件，返回文章列表。"""
@@ -23,12 +23,23 @@ def _load_kb() -> list[dict]:
         return json.load(f)
 
 
+def _tokenize(text: str) -> set[str]:
+    """将查询拆分为词元：英文按空格分词，中文额外提取双字符bigram。"""
+    tokens = set(text.lower().split())
+    # 中文bigram：对连续中文字符提取2-gram（词粒度搜索）
+    if any('\u4e00' <= c <= '\u9fff' for c in text):
+        chars = [c for c in text if '\u4e00' <= c <= '\u9fff']
+        for i in range(len(chars) - 1):
+            tokens.add(chars[i] + chars[i + 1])
+    return tokens
+
+
 def _bm25_score(query: str, document: dict) -> float:
     """
     简化版BM25评分：统计查询词在文档中的出现频率。
-    实际生产可替换为 rank_bm25 库。
+    中文查询使用bigram分词；实际生产可替换为 rank_bm25 库。
     """
-    query_words = set(query.lower().split())
+    query_words = _tokenize(query)
     # 合并所有可搜索文本
     text = " ".join([
         document.get("question", ""),
