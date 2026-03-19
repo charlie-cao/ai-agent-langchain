@@ -1,6 +1,6 @@
 # AI Agent 工程实战合集 🤖
 
-> 基于 LangGraph + LangChain + Ollama 的生产级 AI Agent 项目集，共 **24 个独立可运行项目**，全部测试通过。
+> 基于 LangGraph + LangChain + Ollama 的生产级 AI Agent 项目集，共 **30 个独立可运行项目**，全部测试通过。
 
 ---
 
@@ -58,6 +58,17 @@
 | 23 | [openclaw 抖音](project_23_openclaw_douyin/) | 抖音 ✅ | 30/30 | 视频脚本, 开场钩子, CTA设计 |
 | 24 | [openclaw Twitter](project_24_openclaw_twitter/) | Twitter/X ✅ | 35/35 | 推文/线程, <=280字符, UTC排期 |
 
+### openclaw 智能工作流系列
+
+| # | 项目 | 功能 | 测试 | 核心特性 |
+|---|------|------|------|---------|
+| 25 | [openclaw 早报](project_25_openclaw_morning_brief/) | 信息聚合 ✅ | 44/44 | RSS多源聚合, 去重排序, 分类早报 |
+| 26 | [openclaw 深度调研](project_26_openclaw_deep_research/) | 研究分析 ✅ | 49/49 | 子查询分解, 交叉验证, 可信度评分 |
+| 27 | [openclaw 热点追踪](project_27_openclaw_trend_tracker/) | 趋势监控 ✅ | 54/54 | 热度衰减模型, 内容机会分析 |
+| 28 | [openclaw 内容改写](project_28_openclaw_content_repurposer/) | 内容分发 ✅ | 63/63 | 5平台适配, 合规检查, 字符限制 |
+| 29 | [openclaw 个人记忆](project_29_openclaw_personal_memory/) | 知识管理 ✅ | 57/57 | 7种记忆类型, 关键词召回, 重要度分级 |
+| 30 | [openclaw 营销规划](project_30_openclaw_campaign_planner/) | 营销自动化 ✅ | 55/55 | 5种活动类型, 90天日历, 触达预估 |
+
 ---
 
 ## 快速启动
@@ -83,14 +94,15 @@ uv run uvicorn api:app --port 8000 --reload
 
 ```
 ai_agent_dev/
-├── plan001.md                       # 项目规划文档（24个项目）
+├── plan001.md                       # 项目规划文档
 ├── scripts/                         # 公共工具脚本
 │   ├── check_ollama.py
 │   ├── setup_env.py
 │   ├── benchmark.py
 │   └── run_all.bat
-├── project_01_rag_agent/ ... project_19_privacy_agent/  # 垂直行业 Agent
-└── project_20_openclaw_weibo/ ... project_24_openclaw_twitter/  # 社媒内容系列
+├── project_01_rag_agent/ ... project_19_privacy_agent/        # 垂直行业 Agent
+├── project_20_openclaw_weibo/ ... project_24_openclaw_twitter/ # 社媒内容系列
+└── project_25_openclaw_morning_brief/ ... project_30_openclaw_campaign_planner/ # 智能工作流系列
 ```
 
 ---
