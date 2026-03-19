@@ -1,17 +1,17 @@
-# agent.py — Multi-Agent Collaboration System (LangGraph)
-# Scenarios: Market Research Report & Social Media Content Production
+# agent.py — Multi-Agent Collaboration System (LangGraph) v2.0
 from __future__ import annotations
 
 import json
 import time
 from typing import TypedDict, Annotated, Optional, Generator
 
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import BaseMessage
 from langgraph.graph import StateGraph, END
 from loguru import logger
 
 from config import (
+    settings,
     OLLAMA_BASE_URL, DEFAULT_MODEL, TEMPERATURE, CREATIVE_TEMPERATURE,
     MAX_REVISION_LOOPS, CRITIC_PASS_SCORE,
     SCENARIO_MARKET_RESEARCH, SCENARIO_SOCIAL_MEDIA,
@@ -27,15 +27,15 @@ from tools.search_tool import multi_search
 # ── Shared State ───────────────────────────────────────────────────────────────
 class MultiAgentState(TypedDict):
     task: str
-    scenario: str                   # market_research | social_media
-    plan: dict                      # planner output
+    scenario: str
+    plan: dict
     search_results: str
     research: str
     content: str
-    critique: dict                  # critic output
+    critique: dict
     summary: str
     revision_count: int
-    agent_log: list[dict]           # [{agent, output, time_ms}]
+    agent_log: list[dict]
     final_output: str
     total_latency_ms: float
 
@@ -66,7 +66,6 @@ def node_planner(state: MultiAgentState) -> MultiAgentState:
     try:
         plan = json.loads(result.content)
     except json.JSONDecodeError:
-        # Fallback: extract JSON from markdown code block
         import re
         match = re.search(r'\{.*\}', result.content, re.DOTALL)
         plan = json.loads(match.group()) if match else {
@@ -201,7 +200,7 @@ def get_graph():
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 def run(task: str, scenario: str = SCENARIO_MARKET_RESEARCH) -> dict:
-    """Run the full multi-agent pipeline. Returns final output + agent log."""
+    """Run the full multi-agent pipeline."""
     t0 = time.perf_counter()
     initial: MultiAgentState = {
         "task": task,
@@ -223,7 +222,7 @@ def run(task: str, scenario: str = SCENARIO_MARKET_RESEARCH) -> dict:
 
 
 def run_stream(task: str, scenario: str = SCENARIO_MARKET_RESEARCH) -> Generator[dict, None, None]:
-    """Stream agent progress events. Each event: {type, agent, content/preview}."""
+    """Stream agent progress events."""
     t0 = time.perf_counter()
     initial: MultiAgentState = {
         "task": task,

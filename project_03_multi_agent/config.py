@@ -1,24 +1,56 @@
-# config.py — project_03_multi_agent
+# config.py — project_03_multi_agent (v2.0)
+from pathlib import Path
+from pydantic_settings import BaseSettings
+from pydantic import Field
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
 
-OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "qwen3.5:latest")
-TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.1"))
-CREATIVE_TEMPERATURE: float = float(os.getenv("CREATIVE_TEMPERATURE", "0.7"))
 
-MAX_REVISION_LOOPS: int = int(os.getenv("MAX_REVISION_LOOPS", "2"))
-CRITIC_PASS_SCORE: int = int(os.getenv("CRITIC_PASS_SCORE", "7"))  # 0-10 scale
+class Settings(BaseSettings):
+    """Application settings with validation."""
+    
+    # Ollama
+    ollama_base_url: str = Field(default="http://localhost:11434", alias="OLLAMA_BASE_URL")
+    default_model: str = Field(default="qwen3.5:latest", alias="DEFAULT_MODEL")
+    temperature: float = Field(default=0.1, alias="TEMPERATURE")
+    creative_temperature: float = Field(default=0.7, alias="CREATIVE_TEMPERATURE")
+    
+    # Agent settings
+    max_revision_loops: int = Field(default=2, alias="MAX_REVISION_LOOPS")
+    critic_pass_score: int = Field(default=7, alias="CRITIC_PASS_SCORE")
+    
+    # Search
+    max_search_results: int = Field(default=5, alias="MAX_SEARCH_RESULTS")
+    
+    # LangSmith (optional)
+    langsmith_api_key: str = Field(default="", alias="LANGSMITH_API_KEY")
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
 
-MAX_SEARCH_RESULTS: int = int(os.getenv("MAX_SEARCH_RESULTS", "5"))
+
+settings = Settings()
+
+
+# Legacy exports
+OLLAMA_BASE_URL = settings.ollama_base_url
+DEFAULT_MODEL = settings.default_model
+TEMPERATURE = settings.temperature
+CREATIVE_TEMPERATURE = settings.creative_temperature
+MAX_REVISION_LOOPS = settings.max_revision_loops
+CRITIC_PASS_SCORE = settings.critic_pass_score
+MAX_SEARCH_RESULTS = settings.max_search_results
+LANGSMITH_ENABLED = settings.langsmith_api_key != ""
 
 # Supported scenarios
 SCENARIO_MARKET_RESEARCH = "market_research"
 SCENARIO_SOCIAL_MEDIA = "social_media"
 
-LANGSMITH_ENABLED: bool = os.getenv("LANGSMITH_API_KEY", "") != ""
+# LangSmith setup
 if LANGSMITH_ENABLED:
     os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
     os.environ.setdefault("LANGCHAIN_PROJECT", "project_03_multi_agent")
+    os.environ.setdefault("LANGCHAIN_API_KEY", settings.langsmith_api_key)
